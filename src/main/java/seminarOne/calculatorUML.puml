@@ -20,7 +20,7 @@ interface model.logger.Logger {
 ~ void log(String)
 }
 class model.logger.LogCanCalculateFactory {
-~ Logger logger
+- Logger logger
 + CanCalculate create(ComplexNumber)
 }
 class model.calculator.CanCalculateFactory {
@@ -40,8 +40,8 @@ interface model.calculator.CanCalculate {
 ~ ComplexNumber result()
 }
 class model.logger.LogCalculator {
-~ Calculator calculator
-~ Logger logger
+- Calculator calculator
+- Logger logger
 + void sum(ComplexNumber)
 + void multiply(ComplexNumber)
 + void subtract(ComplexNumber)
@@ -66,4 +66,11 @@ model.calculator.ICanCalculateFactory <|.. model.logger.LogCanCalculateFactory
 model.calculator.ICanCalculateFactory <|.. model.calculator.CanCalculateFactory
 model.calculator.CanCalculate <|.. model.logger.LogCalculator
 model.calculator.CanCalculate <|.. model.calculator.Calculator
+Main ..> Logger : uses
+Main ..> LogCanCalculateFactory : uses
+Main ..> ConsoleView : uses
+ConsoleView ..> ICanCalculateFactory : uses
+Calculator ..> ComplexNumber : uses
+LogCanCalculateFactory ..> Logger : uses
+LogCanCalculateFactory "1" *.. "1" LogCalculator : creates
 @enduml
