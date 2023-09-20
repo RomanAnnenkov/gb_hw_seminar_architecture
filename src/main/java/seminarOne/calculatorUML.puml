@@ -1,0 +1,69 @@
+@startuml
+interface model.calculator.ICanCalculateFactory {
+~ CanCalculate create(ComplexNumber)
+}
+class model.ComplexNumber {
+- int a
+- int b
++ int getA()
++ int getB()
++ void setA(int)
++ void setB(int)
++ String toString()
+}
+class model.logger.FileLogger {
+~ String fileName
+~ DateTimeFormatter fileNameDate
++ void log(String)
+}
+interface model.logger.Logger {
+~ void log(String)
+}
+class model.logger.LogCanCalculateFactory {
+~ Logger logger
++ CanCalculate create(ComplexNumber)
+}
+class model.calculator.CanCalculateFactory {
++ CanCalculate create(ComplexNumber)
+}
+class views.ConsoleView {
+- Scanner scanner
+- ICanCalculateFactory iCanCalculateFactory
++ void run()
+- ComplexNumber getArgument()
+}
+interface model.calculator.CanCalculate {
+~ void sum(ComplexNumber)
+~ void multiply(ComplexNumber)
+~ void subtract(ComplexNumber)
+~ void divide(ComplexNumber)
+~ ComplexNumber result()
+}
+class model.logger.LogCalculator {
+~ Calculator calculator
+~ Logger logger
++ void sum(ComplexNumber)
++ void multiply(ComplexNumber)
++ void subtract(ComplexNumber)
++ void divide(ComplexNumber)
++ ComplexNumber result()
+}
+class Main {
++ {static} void main(String[])
+}
+class model.calculator.Calculator {
+- ComplexNumber complexNumber
++ void sum(ComplexNumber)
++ void multiply(ComplexNumber)
++ void subtract(ComplexNumber)
++ void divide(ComplexNumber)
++ ComplexNumber result()
+}
+
+
+model.logger.Logger <|.. model.logger.FileLogger
+model.calculator.ICanCalculateFactory <|.. model.logger.LogCanCalculateFactory
+model.calculator.ICanCalculateFactory <|.. model.calculator.CanCalculateFactory
+model.calculator.CanCalculate <|.. model.logger.LogCalculator
+model.calculator.CanCalculate <|.. model.calculator.Calculator
+@enduml
