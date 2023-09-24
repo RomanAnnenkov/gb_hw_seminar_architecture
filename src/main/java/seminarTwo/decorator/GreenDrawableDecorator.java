@@ -1,6 +1,6 @@
 package seminarTwo.decorator;
 
-public class GreenDrawableDecorator extends DrawableDecorator{
+public class GreenDrawableDecorator extends DrawableDecorator {
     public GreenDrawableDecorator(Drawable decoratedDrawable) {
         super(decoratedDrawable);
     }
@@ -11,7 +11,7 @@ public class GreenDrawableDecorator extends DrawableDecorator{
         setGreenBorder(decoratedDrawable);
     }
 
-    private void setGreenBorder (Drawable decoratedDrawable) {
+    private void setGreenBorder(Drawable decoratedDrawable) {
         System.out.println("Set border to green.");
     }
 }
