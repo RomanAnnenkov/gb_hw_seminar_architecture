@@ -22,6 +22,6 @@ public class Main {
         publisher.attach(subscriberTwo);
 
         publisher.notify("test message");
-        
+
     }
 }

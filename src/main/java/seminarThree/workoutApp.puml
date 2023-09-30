@@ -1,0 +1,97 @@
+@startuml
+
+'1. Single Responsibility Principle (SRP): Каждый класс отвечает за одну задачу.
+'2. Open/Closed Principle (OCP): Расширяемые, но закрытые для модификации компоненты.
+'3. Liskov Substitution Principle (LSP): Обеспечить заменяемость объектов
+' базового класса объектами производных классов без нарушения корректности программы.
+'4. Interface Segregation Principle (ISP): Использовать множество специфических интерфейсов вместо одного обобщенного.
+'5. Dependency Inversion Principle (DIP): Реализовать обратные зависимости — высокоуровневые модули не должны зависеть от низкоуровневых.
+
+' 1 - создание объектов
+class Main {
+  + {static} void main(String[])
+}
+
+' 1 - выполнение операций с упражнениями
+' 2 - используется список с типом базового класса
+' 3 - одинаковое поведения при взаимодействии с базовым классом упражнений, или наследниками
+class model.workout.Workout {
+ - String name
+ - List<BaseExcersize>
+ ~ void addExcersize(Excersize)
+ ~ void removeExcersize(Excersize)
+ ~ void doExcersizes()
+}
+
+' 1 - базовое упражнение
+' 2 - базовый класс, для создания нового типа упражнений достаточно наследования от него
+' 3 - во взаимодействии используюется базовый класс и интерфейсы
+abstract class model.excersize.BaseExcersize {
+ - String name
+ ~ String getName()
+ ~ void setName()
+ ~ abstract void doExcersize()
+}
+
+' 1 - упражнение на время
+' 2 - наследник базового класса
+' 3 - повторяет логику работы базового класса, дополняя своей
+class model.excersize.TimeExcersize extends model.excersize.BaseExcersize {
+ - int seconds
+ ~ void setInterval(int seconds)
+ ~ int getInterval()
+ ~ void doExcersize()
+}
+
+' 1 - упражнение на кол-во повторений
+' 2 - наследник базового класса
+' 3 - повторяет логику работы базового класса, дополняя своей
+class model.excersize.RepetitionExcersize extends model.excersize.BaseExcersize {
+ - int numberOfRepetitions
+ ~ void setRepetitions(int numberOfRepetitions)
+ ~ int getRepetitions()
+ ~ void doExcersize()
+}
+' 1 - интерфейс запуска визуальной оболочки
+' 2 - базовый интерфейс визуальной оболочки
+' 3 - для взаимодействия с другими классами используется интерфейс
+' 4 - отдельный интерфейс для view
+interface view.IView {
+~ void run()
+}
+
+' 1 - консольная визуальная оболочка
+' 2 - наследник базового интерфейса визуальной оболочки
+' 3 - поведение сохраняется благодаря интерфейсу
+' 5 - используя конструктор можно передать ссылки необходимых классов
+class view.ConsoleView implements view.IView {
+- Scanner scanner
+- Workout workout
+- IExcersizeFactory excersizeFactory
+~ void run()
+}
+
+' 1 - интерфейс создания упражнений
+' 2 - базовый интерфейс фабрики упражнений
+' 3 - для взаимодействия с другими классами используется интерфейс
+' 4 - отдельный интерфейс для фабрики упражнений
+interface model.excersize.IExcersizeFactory {
+~ BaseExcersize creates(String excersizeInfo)
+}
+
+' 1 - класс для создания упражнений
+' 2 - в классе имплементирован интерфейс фабрики упражнений
+' 3 - поведение сохраняется благодаря интерфейсу
+class model.excersize.ExcersizeFactory implements model.excersize.IExcersizeFactory {
+~ BaseExcersize creates(String excersizeInfo)
+}
+
+
+Main --> ConsoleView : creates
+Main --> ExcersizeFactory : creates
+Main --> Workout : creates
+ExcersizeFactory --> "0..*" TimeExcersize : creates
+ExcersizeFactory --> "0..*" RepetitionExcersize : creates
+
+
+@enduml
