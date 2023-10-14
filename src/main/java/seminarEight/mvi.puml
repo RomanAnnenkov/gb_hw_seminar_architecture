@@ -1,0 +1,47 @@
+@startuml
+interface MVI.model.ViewState {
+}
+class MVI.view.ConsoleView {
++ void render(ViewState)
+}
+class MVI.model.Task {
+- String name
+- boolean completed
++ void complete()
++ boolean isCompleted()
++ String toString()
+}
+class MVI.presenter.TasksPresenter {
+- List<Task> tasks
+- BaseView view
++ void dispatch(Intent)
++ void loadTasks()
+}
+class MVI.model.TasksViewState {
+- List<Task> tasks
++ String toString()
+}
+class MVI.model.TaskCompletedIntent {
+~ int taskId
++ int getTaskId()
+}
+class MVI.Main {
++ {static} void main(String[])
+}
+interface MVI.model.Intent {
+}
+interface MVI.view.BaseView {
+~ void render(ViewState)
+}
+
+
+MVI.view.BaseView <|.. MVI.view.ConsoleView
+MVI.model.ViewState <|.. MVI.model.TasksViewState
+MVI.model.Intent <|.. MVI.model.TaskCompletedIntent
+
+Main ..> ConsoleView : creates
+Main ..> TasksPresenter : creates
+TasksPresenter "1" *.. "1..*" Task : creates
+Main "1" *.. "1..*" TaskCompletedIntent: creates
+TasksPresenter "1" *.. "1..*" TasksViewState : creates
+@enduml
