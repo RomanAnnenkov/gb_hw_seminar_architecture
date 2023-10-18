@@ -1,0 +1,20 @@
+package seminarNine;
+
+import com.sun.net.httpserver.HttpServer;
+import seminarNine.model.UserHandler;
+import seminarNine.repository.IUserStorage;
+import seminarNine.repository.UserStorageList;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+
+public class Main {
+    public static void main(String[] args) throws IOException {
+        HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+        IUserStorage userStorage = new UserStorageList();
+        server.createContext("/users", new UserHandler(userStorage));
+        server.start();
+        System.out.println("Server started on port 8080");
+
+    }
+}
