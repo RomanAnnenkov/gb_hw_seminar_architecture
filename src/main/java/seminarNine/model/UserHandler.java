@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import seminarNine.controller.IUserController;
+import seminarNine.exceptions.UserNotFountException;
 
 import java.io.*;
 
@@ -48,6 +49,9 @@ public class UserHandler implements HttpHandler {
                     int userId = jsonNode.get("userId").asInt();
                     responseBody.append(objectMapper.writeValueAsString(userStorage.deleteUser(userId)));
                     exchange.sendResponseHeaders(200, responseBody.length());
+                } catch (UserNotFountException e) {
+                    responseBody.append(e.getMessage());
+                    exchange.sendResponseHeaders(404, responseBody.length());
                 } catch (Exception e) {
                     responseBody.append("DELETE POST error ").append(e.getMessage());
                     exchange.sendResponseHeaders(400, responseBody.length());
