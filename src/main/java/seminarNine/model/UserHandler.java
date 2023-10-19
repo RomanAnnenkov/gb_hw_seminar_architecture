@@ -4,16 +4,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import seminarNine.repository.IUserStorage;
+import seminarNine.controller.IUserController;
 
 import java.io.*;
 
 public class UserHandler implements HttpHandler {
-    private final IUserStorage userStorage;
+    private final IUserController userStorage;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public UserHandler(IUserStorage userStorage) {
+    public UserHandler(IUserController userStorage) {
         this.userStorage = userStorage;
     }
 
@@ -38,7 +38,7 @@ public class UserHandler implements HttpHandler {
                     exchange.sendResponseHeaders(201, responseBody.length());
                 } catch (Exception e) {
                     responseBody.append("POST error").append(e.getMessage());
-                    exchange.sendResponseHeaders(401, responseBody.length());
+                    exchange.sendResponseHeaders(400, responseBody.length());
                 }
                 break;
             case "DELETE":
@@ -50,7 +50,7 @@ public class UserHandler implements HttpHandler {
                     exchange.sendResponseHeaders(200, responseBody.length());
                 } catch (Exception e) {
                     responseBody.append("DELETE POST error ").append(e.getMessage());
-                    exchange.sendResponseHeaders(401, responseBody.length());
+                    exchange.sendResponseHeaders(400, responseBody.length());
                 }
                 break;
             default:

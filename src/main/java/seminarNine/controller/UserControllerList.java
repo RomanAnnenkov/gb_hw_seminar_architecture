@@ -1,4 +1,4 @@
-package seminarNine.repository;
+package seminarNine.controller;
 
 import seminarNine.exceptions.UserNotFountException;
 import seminarNine.model.User;
@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class UserStorageList implements IUserStorage {
+public class UserControllerList implements IUserController {
     private final List<User> users = new ArrayList<>();
     private final AtomicInteger idGenerator = new AtomicInteger(1);
 
