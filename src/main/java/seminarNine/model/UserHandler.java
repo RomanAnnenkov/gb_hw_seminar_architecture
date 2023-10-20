@@ -23,6 +23,7 @@ public class UserHandler implements HttpHandler {
         String requestMethod = exchange.getRequestMethod();
         StringBuilder responseBody = new StringBuilder();
         exchange.getResponseHeaders().set("Content-Type", "application/json");
+        exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
 
         switch (requestMethod) {
             case "GET":
