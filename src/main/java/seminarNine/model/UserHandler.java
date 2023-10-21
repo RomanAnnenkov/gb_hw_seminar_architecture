@@ -1,21 +1,22 @@
 package seminarNine.model;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import seminarNine.controller.IUserController;
+import seminarNine.exceptions.PathParameterException;
 import seminarNine.exceptions.UserNotFountException;
 
 import java.io.*;
+import java.util.Arrays;
 
 public class UserHandler implements HttpHandler {
-    private final IUserController userStorage;
+    private final IUserController userController;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public UserHandler(IUserController userStorage) {
-        this.userStorage = userStorage;
+        this.userController = userStorage;
     }
 
     @Override
@@ -24,53 +25,73 @@ public class UserHandler implements HttpHandler {
         StringBuilder responseBody = new StringBuilder();
         exchange.getResponseHeaders().set("Content-Type", "application/json");
         exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
+        exchange.getResponseHeaders().set("Access-Control-Allow-Methods", "DELETE, POST, GET, OPTIONS");
+        exchange.getResponseHeaders().set("Access-Control-Allow-Headers", "Content-Type");
+        String[] pathElements = exchange.getRequestURI().getPath().split("/");
 
         switch (requestMethod) {
             case "GET":
-                responseBody.append(objectMapper.writeValueAsString(userStorage.getUsers()));
+                responseBody.append(objectMapper.writeValueAsString(userController.getUsers()));
                 exchange.sendResponseHeaders(200, responseBody.length());
                 break;
             case "POST":
                 try {
-                    String requestBody = getRequestBodyString(exchange.getRequestBody());
-                    JsonNode jsonNode = objectMapper.readTree(requestBody);
-                    String userName = jsonNode.get("userName").asText();
-                    User newUser = userStorage.addUser(userName);
-                    responseBody.append(objectMapper.writeValueAsString(newUser));
-                    exchange.sendResponseHeaders(201, responseBody.length());
-                } catch (Exception e) {
-                    responseBody.append("POST error").append(e.getMessage());
+                    if (pathElements.length == 3) {
+                        User newUser = userController.addUser(pathElements[2]);
+                        responseBody.append(objectMapper.writeValueAsString(newUser));
+                        exchange.sendResponseHeaders(201, responseBody.length());
+                    } else if (pathElements.length == 2) {
+                        String bodyString = getRequestBodyString(exchange.getRequestBody());
+                        userController.addAll(Arrays.asList(objectMapper.readValue(bodyString, User[].class)));
+                        exchange.sendResponseHeaders(200, responseBody.length());
+                    } else {
+                        throw new PathParameterException("user name not found");
+                    }
+                } catch (PathParameterException e) {
+                    responseBody.append("{\"error\":\"method POST : ").append(e.getMessage()).append("\"}");
                     exchange.sendResponseHeaders(400, responseBody.length());
+                } catch (Exception e) {
+                    responseBody.append(e.getMessage());
+                    exchange.sendResponseHeaders(500, responseBody.length());
                 }
                 break;
             case "DELETE":
                 try {
-                    String requestBody = getRequestBodyString(exchange.getRequestBody());
-                    JsonNode jsonNode = objectMapper.readTree(requestBody);
-                    int userId = jsonNode.get("userId").asInt();
-                    responseBody.append(objectMapper.writeValueAsString(userStorage.deleteUser(userId)));
-                    exchange.sendResponseHeaders(200, responseBody.length());
+                    if (pathElements.length == 3) {
+                        int userId = Integer.parseInt(pathElements[2]);
+                        responseBody.append(objectMapper.writeValueAsString(userController.deleteUser(userId)));
+                        exchange.sendResponseHeaders(200, responseBody.length());
+                    } else {
+                        throw new PathParameterException("user id not found");
+                    }
                 } catch (UserNotFountException e) {
-                    responseBody.append(e.getMessage());
+                    responseBody.append("{\"error\":\"method DELETE : ").append(e.getMessage()).append("\"}");
                     exchange.sendResponseHeaders(404, responseBody.length());
                 } catch (Exception e) {
-                    responseBody.append("DELETE POST error ").append(e.getMessage());
+                    responseBody.append("{\"error\":\"method DELETE : ").append(e.getMessage()).append("\"}");
                     exchange.sendResponseHeaders(400, responseBody.length());
                 }
                 break;
+            case "OPTIONS":
+                exchange.sendResponseHeaders(200, responseBody.length());
+                break;
             default:
-
+                responseBody.append("{\"error\":\"Method not allowed\"}");
+                exchange.sendResponseHeaders(405, responseBody.length());
         }
 
         try (OutputStream os = exchange.getResponseBody()) {
             os.write(responseBody.toString().getBytes());
         }
-
     }
 
     private String getRequestBodyString(InputStream inputStream) throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-            return reader.readLine();
+            StringBuilder result = new StringBuilder();
+            while (reader.ready()) {
+                result.append(reader.readLine());
+            }
+            return result.toString();
         }
     }
 }

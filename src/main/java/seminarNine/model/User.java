@@ -1,8 +1,10 @@
 package seminarNine.model;
 
 public class User {
-    private final int id;
+    private int id;
     private String name;
+
+    public User() {};
 
     public User(int id, String name) {
         this.id = id;
@@ -19,6 +21,9 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+    public void setId(int id) {
+        this.id = id;
     }
 
     @Override

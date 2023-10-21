@@ -31,5 +31,8 @@ public class UserControllerList implements IUserController {
         return users;
     }
 
+    public void addAll(List<User> listUsers) {
+        users.addAll(listUsers);
+    }
 
 }
